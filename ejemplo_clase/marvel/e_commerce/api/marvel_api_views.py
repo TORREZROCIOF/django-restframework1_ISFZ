@@ -15,7 +15,7 @@ PRIVATE_KEY = '2c0373e00d85edb4560f68ddc2094014e8694f90'
 TS = 1
 TO_HASH = str(TS)+PRIVATE_KEY+PUBLIC_KEY
 HASHED = hashlib.md5(TO_HASH.encode())
-URL_BASE = 'http://gateway.marvel.com/v1/public/'
+URL_BASE = 'https://gateway.marvel.com/v1/public/'
 ENDPOINT = 'comics'
 PARAMS = dict(ts=TS, apikey=PUBLIC_KEY, hash=HASHED.hexdigest())
 
@@ -121,7 +121,24 @@ def get_comics(request):
         </tr>
         
         '''
-    template += f'</table></div></div>'
+    next_offset = offset + limit
+    prev_offset = max(offset - limit, 0)
+    template += f'''</table>
+<div style="margin-top: 20px;">
+    <form method="get" style="display: inline;">
+        <input type="hidden" name="limit" value="{limit}">
+        <input type="hidden" name="offset" value="{prev_offset}">
+        <input type="submit" value="« Página anterior" {'disabled' if offset == 0 else ''}>
+    </form>
+
+    <form method="get" style="display: inline; margin-left: 10px;">
+        <input type="hidden" name="limit" value="{limit}">
+        <input type="hidden" name="offset" value="{next_offset}">
+        <input type="submit" value="Página siguiente »">
+    </form>
+</div>
+</div>
+</div>'''
     # Imprimimos por consola el HTML construido (se puede probar en https://codepen.io/):
     print(template)
     # O lo podemos guardar en un HTML, como el nombre no cambia, el archivo se pisa en cada petición:
